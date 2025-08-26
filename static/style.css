@@ -1,0 +1,41 @@
+body{
+    font-size: 18px;
+    background-color: #7c4d7781;
+}
+
+.center-box {
+    width: 100%;
+    display: flex;
+    justify-content: center;  /* horizontal centering of container */
+    align-items: center;      /* vertical centering */
+}
+
+.ticker-container {
+    width: 17rem;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.ticker {
+    display: inline-flex;         /* place items in a row */
+    animation: ticker 5s linear 3;
+}
+
+.ticker span {
+    font-size: 4rem;
+    animation-iteration-count: infinite ;
+    padding: 5px 5px;
+}
+
+@keyframes ticker {
+  from {
+      transform: translateX( 0% );
+  }
+  to {
+      transform: translateX( -101% );
+  }
+}
+
+.blog-preview {
+  font-size: 18rem;
+}

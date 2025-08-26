@@ -1,0 +1,17 @@
+{% include 'base.html' %}
+
+<body>
+    <h1>my blog</h1>
+    <ul>
+        {% for blog in blogs %}
+        <li>
+            <div class="blog-preview">
+                <h2>{{ blog.title }}</h2>
+                <h3>{{ blog.date }}</h3>
+                <h3>{{ blog.authors }}</h3>
+                <a href="{{ url_for('blog') }}/{{ blog.url }}">View Full Blog</a>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</body>

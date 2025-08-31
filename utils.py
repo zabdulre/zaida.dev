@@ -1,17 +1,20 @@
 from datetime import datetime
 from pathlib import Path
 import time
+import markdown
 
 blogsFolder = '/root/zaida.dev/blogs'
 datePrintFormat: str = "%b %m, %Y"
+previewSize = 200
 
 class Blog:
-    def __init__(self, name: str, authors: str, date: str, content: str):
+    def __init__(self, name: str, authors: str, date: str, preview: str, path: Path):
         self.title: str = name
         self.authors: str = authors
         self.date: str = date
-        self.content: str = content
+        self.preview: str = preview
         self.url: str = name.replace(" ", "-").rstrip()
+        self.path: Path = path
         
 blogsDict: dict[str, Blog] = {}
 
@@ -20,11 +23,12 @@ def process_ready(blog : Path) -> (Blog|None):
     with blog.open() as f:
         title: str = f.readline()
         authors: str = f.readline()
-        content: str = f.read()
-    with open(blog.with_name(blog.name[:-5]+"published"), 'w') as file:
-        file.write(str(timestamp) + "\n" + title + authors + content)
-        blog.unlink()
-        return Blog(title, authors, datetime.fromtimestamp(timestamp).strftime(datePrintFormat), content)
+        preview: str = markdown.markdown(f.read(previewSize))
+        fileToOpen: Path = blog.with_name(blog.name[:-5]+"published")
+        with open(fileToOpen, 'w') as file:
+            file.write(str(timestamp) + "\n" + title + authors + preview)
+            blog.unlink()
+            return Blog(title, authors, datetime.fromtimestamp(timestamp).strftime(datePrintFormat), preview, fileToOpen)
     return None
 
 def process_published(blog : Path) -> (Blog|None):
@@ -32,8 +36,8 @@ def process_published(blog : Path) -> (Blog|None):
         date: str = datetime.fromtimestamp(float(f.readline())).strftime(datePrintFormat)
         title: str = f.readline()
         authors: str = f.readline()
-        content: str = f.read()
-        return Blog(title, authors, date, content)
+        preview: str = markdown.markdown(f.read(previewSize))
+        return Blog(title, authors, date, preview, blog)
     return None
 
 def refreshBlogsIfStale() -> (None):
@@ -57,6 +61,15 @@ def refreshBlogsIfStale() -> (None):
         blogsDict[i.url] = i #TODO optimize memory usage here
     return None
 
+def getBlogContent(pathToBlog: Path, published: bool=True) -> str:
+    with pathToBlog.open() as f:
+        f.readline()
+        f.readline()
+        if published:
+            f.readline()
+        return markdown.markdown(f.read())
+    return "This blog no longer exists"
+        
 
 #TODO consider adding a file that saves this info kind of like a cache and this code only runs when the file gets out of date or some static array
 #TODO check whether dates work

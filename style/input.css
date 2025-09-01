@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+.header{
+    @apply font-mono
+}
